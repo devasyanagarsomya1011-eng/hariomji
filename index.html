@@ -1,10 +1,336 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shree Ram Medical</title><style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f4f7fb;color:#13233c}.top{height:76px;background:#062e6c;color:white;display:flex;align-items:center;padding:0 28px;gap:13px}.logo{width:57px;height:57px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #fff}.brand{font-weight:800;letter-spacing:.7px}.brand small{display:block;font-weight:400;font-size:11px;opacity:.75}.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 76px)}aside{background:#fff;border-right:1px solid #dde5ef;padding:18px 10px}aside button{border:0;background:transparent;width:100%;padding:13px;text-align:left;border-radius:8px;color:#45556d;font-size:14px;cursor:pointer}aside button.active,aside button:hover{background:#e9f0fc;color:#073b89;font-weight:700}main{padding:28px;max-width:1500px;width:100%;margin:auto}h1{margin:0 0 5px;font-size:24px}p.sub{margin:0 0 22px;color:#6b7a90}.panel{background:#fff;border:1px solid #e0e7ef;border-radius:12px;padding:20px;box-shadow:0 3px 12px #2d55700c;margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.span2{grid-column:span 2}label{font-size:12px;font-weight:700;color:#52627b;display:block;margin-bottom:5px}input,select{width:100%;padding:10px;border:1px solid #cbd6e2;border-radius:7px;background:#fff;color:#192b45}button.primary,button.outline,button.danger{padding:10px 14px;border-radius:7px;border:0;font-weight:700;cursor:pointer}.primary{background:#073b89;color:#fff}.outline{background:#eef4ff;color:#073b89}.danger{background:#fce8e7;color:#a4231c}.toolbar{display:flex;gap:9px;align-items:end;flex-wrap:wrap}.toolbar>*{min-width:140px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.metric{padding:17px;border-radius:10px;background:linear-gradient(135deg,#06357e,#1559b0);color:white}.metric b{font-size:25px;display:block;margin-top:7px}.item-row{display:grid;grid-template-columns:2.5fr 1fr 1fr 1fr auto;gap:10px;margin:10px 0}.total{font-size:18px;font-weight:800;text-align:right;padding-top:14px;border-top:1px solid #e5eaf0}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th{text-align:left;background:#f5f8fc;color:#53647c}th,td{padding:11px 9px;border-bottom:1px solid #e8edf3;white-space:nowrap}.status{padding:4px 7px;border-radius:20px;font-size:11px;font-weight:800}.COMPLETED{background:#e6f6ec;color:#16723c}.CANCELLED{background:#fce7e6;color:#aa2520}.hidden,.modal.hidden{display:none}.actions button{font-size:11px;padding:6px 7px;margin-right:4px}.notice{position:fixed;right:20px;bottom:20px;background:#16375e;color:#fff;padding:12px 16px;border-radius:8px;display:none}.modal{position:fixed;inset:0;background:#001a3b66;display:grid;place-items:center}.modal .panel{max-width:780px;width:90%;max-height:85vh;overflow:auto}@media(max-width:800px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto;padding:8px}aside button{white-space:nowrap}.grid,.summary{grid-template-columns:1fr 1fr}.span2{grid-column:span 2}.item-row{grid-template-columns:1fr 1fr}.item-row button{grid-column:span 2}main{padding:16px}}
-</style></head><body><header class="top"><img id="appLogo" class="logo" src="/assets/shree-ram-medical-logo.png" alt="Shree Ram Medical logo"><div class="brand">SHREE RAM MEDICAL<small>Hospital Pharmacy • Rewas Dewda, M.P.</small></div></header><div class="layout"><aside><button class="active" onclick="show('billing',this)">New Bill</button><button onclick="show('inventory',this);loadInventory()">Medicines & Stock</button><button onclick="show('history',this)">Bill History</button><button onclick="show('reports',this)">Reports & Exports</button><button onclick="show('admin',this)">Admin Backup</button></aside><main>
-<section id="billing"><h1>New Cash Memo</h1><p class="sub">Every completed bill is saved immediately to the persistent database.</p><div class="panel"><div class="grid"><div class="span2"><label>Customer / Patient Name</label><input id="customer" placeholder="Walk-in Customer"></div><div><label>Mobile Number</label><input id="mobile" placeholder="10 digit mobile"></div><div><label>Bill Date</label><input id="date" type="date"></div><div class="span2"><label>Doctor Name</label><input id="doctor" list="doctors" placeholder="Select or type doctor"><datalist id="doctors"></datalist></div><div><label>Payment Mode</label><select id="payment"><option>Cash</option><option>UPI</option><option>Card</option><option>Credit</option></select></div><div><label>GST (₹)</label><input id="gst" type="number" value="0" min="0" oninput="calc()"></div></div></div><div class="panel"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">Medicines</h2><button class="outline" onclick="addItem()">+ Add Medicine</button> <button class="primary" onclick="addCustomMedicine(false)">+ Custom Medicine</button></div><div id="items"></div><div class="grid" style="margin-top:13px"><div><label>Bill Discount (₹)</label><input id="discount" value="0" type="number" min="0" oninput="calc()"></div></div><div class="total">Grand Total: ₹<span id="total">0.00</span></div><button class="primary" onclick="saveBill()">Save Bill & Print</button></div></section>
-<section id="history" class="hidden"><h1>Bill History</h1><p class="sub">Search stored invoices, export individual bills, and cancel with stock restoration.</p><div class="panel toolbar"><div><label>Search bill, patient, mobile, doctor</label><input id="search" oninput="loadBills()" placeholder="Search..."></div><div><label>From Date</label><input id="from" type="date" onchange="loadBills()"></div><div><label>To Date</label><input id="to" type="date" onchange="loadBills()"></div><button class="outline" onclick="downloadReport('excel')">Export Excel</button><button class="outline" onclick="downloadReport('word')">Export Word</button><button class="outline" onclick="downloadReport('pdf')">Export PDF</button><button class="primary" onclick="window.print()">Print</button></div><div class="panel tablewrap"><table><thead><tr><th>Bill No.</th><th>Date</th><th>Customer</th><th>Doctor</th><th>Total</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody id="billRows"></tbody></table></div></section>
-<section id="inventory" class="hidden"><h1>Medicines & Stock</h1><p class="sub">View all saved medicines, batches, selling prices, and available quantities. Add a medicine before billing when needed.</p><div class="panel"><button class="primary" onclick="addCustomMedicine(true)">+ Add New Medicine to Stock</button></div><div class="panel tablewrap"><table><thead><tr><th>Medicine</th><th>Manufacturer</th><th>Batch</th><th>Expiry</th><th>MRP</th><th>Selling Price</th><th>Available Qty</th></tr></thead><tbody id="stockRows"></tbody></table></div></section><section id="reports" class="hidden"><h1>Reports & Exports</h1><p class="sub">Actual reports from persisted database data. Use the date filters in Bill History to create today, monthly, or custom range exports.</p><div class="summary"><div class="metric">COMPLETED BILLS<b id="rBills">0</b></div><div class="metric">SALES TOTAL<b>₹<span id="rTotal">0.00</span></b></div><div class="metric">CANCELLED BILLS<b id="rCancelled">0</b></div></div><div class="panel"><h2>Available report downloads</h2><p>All Bills · Today’s Bills · Monthly Bills · Custom Date Range · Medicine/Sales · Purchase · Stock · Customer · Profit</p><button class="primary" onclick="downloadReport('excel')">Download Excel</button> <button class="outline" onclick="downloadReport('word')">Download Word</button> <button class="outline" onclick="downloadReport('pdf')">Download PDF</button> <button class="outline" onclick="window.print()">Print</button></div></section>
-<section id="admin" class="hidden"><h1>Administrator Backup</h1><p class="sub">The full relational database is kept on the server and can be safely downloaded for backup.</p><div class="panel"><h2>Hospital Logo</h2><p>Upload PNG, JPG, or WEBP. The selected logo is saved in the database.</p><div class="toolbar"><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp"><button class="primary" onclick="saveLogo()">Save Logo</button></div></div><div class="panel"><h2>Database backup</h2><p>Download a timestamped SQLite backup containing bills, items, payments, stock, customers, and the audit log.</p><button class="primary" onclick="location.href='/api/backup'">Download Backup</button></div><div class="panel"><h2>Restore database</h2><p>For security, enter the absolute server path to a previously downloaded backup file.</p><div class="toolbar"><input id="restorePath" placeholder="/absolute/path/backup.db"><button class="danger" onclick="restoreDb()">Restore Database</button></div></div></section>
-</main></div><div id="notice" class="notice"></div><div id="modal" class="modal hidden"><div class="panel"><button style="float:right" onclick="closeModal()">×</button><div id="modalContent"></div></div></div><script>
-let meds=[],billItems=[];const $=id=>document.getElementById(id);$('date').value=new Date().toISOString().slice(0,10);function toast(s){$('notice').textContent=s;$('notice').style.display='block';setTimeout(()=>$('notice').style.display='none',2800)}async function api(url,opt){let r=await fetch(url,opt);let x=await r.json();if(!r.ok)throw Error(x.error||'Request failed');return x}function show(id,b){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$(id).classList.remove('hidden');document.querySelectorAll('aside button').forEach(x=>x.classList.remove('active'));b.classList.add('active');if(id==='history')loadBills();if(id==='reports')loadReports()}async function init(){try{let logo=await api("/api/settings/logo");if(logo.logo)$("appLogo").src=logo.logo}catch(e){}let x=await api('/api/bootstrap');meds=x.medicines;$('doctors').innerHTML=x.doctors.map(d=>`<option value="${d.name}">`).join('');addItem()}async function saveLogo(){let f=$("logoFile").files[0];if(!f)return toast("Choose a logo file");if(f.size>1500000)return toast("Logo must be below 1.5 MB");let reader=new FileReader();reader.onload=async()=>{try{await api("/api/settings/logo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dataUrl:reader.result})});$("appLogo").src=reader.result;toast("Logo saved") }catch(e){toast(e.message)}};reader.readAsDataURL(f)}async function loadInventory(){let x=await api("/api/inventory");document.getElementById("stockRows").innerHTML=x.map(m=>"<tr><td>"+m.name+"</td><td>"+(m.manufacturer||"-")+"</td><td>"+m.batch_number+"</td><td>"+(m.expiry_date||"-")+"</td><td>₹"+m.mrp+"</td><td>₹"+m.selling_price+"</td><td>"+m.batch_stock+"</td></tr>").join("")}function customAmount(){let q=Number(document.getElementById("customQty").value||0),p=Number(document.getElementById("customPrice").value||0);document.getElementById("customAmount").textContent="₹"+(q*p).toFixed(2)}function addCustomMedicine(stockOnly=false){document.getElementById("modalContent").innerHTML=`<h2>Add Custom Medicine</h2><p>Enter medicine details. Amount is calculated automatically.</p><input id="customForStock" type="hidden" value=""><div class="grid"><div class="span2"><label>Medicine Name</label><input id="customName" placeholder="Medicine name"></div><div><label>Quantity</label><input id="customQty" type="number" min="1" value="1" oninput="customAmount()"></div><div><label>Price (₹)</label><input id="customPrice" type="number" min="0" value="0" oninput="customAmount()"></div><div><label>Amount</label><div id="customAmount" style="padding:10px;font-weight:bold">₹0.00</div></div><div><label>MRP (₹)</label><input id="customMrp" type="number" min="0" value="0"></div><div><label>Batch Number</label><input id="customBatch" placeholder="Batch no."></div><div><label>Expiry Date</label><input id="customExpiry" type="date"></div><div class="span2"><label>Manufacturer</label><input id="customManufacturer" placeholder="Manufacturer"></div></div><button class="primary" onclick="saveCustomFromForm()">Save Medicine</button>`;document.getElementById("customForStock").value=stockOnly?"1":"0";document.getElementById("modal").classList.remove("hidden")}async function saveCustomFromForm(){let value=id=>document.getElementById(id).value;let quantity=Number(value("customQty")),price=Number(value("customPrice"));if(!value("customName")||!value("customBatch")||quantity<=0||price<0)return toast("Enter name, batch, quantity and price");try{let r=await api("/api/medicines",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:value("customName"),manufacturer:value("customManufacturer"),batch_number:value("customBatch"),expiry_date:value("customExpiry"),price,mrp:Number(value("customMrp"))||price,stock:quantity})});let x=await api("/api/bootstrap");meds=x.medicines;if(value("customForStock")!=="1"){billItems.push({id:Date.now()+Math.random(),batch_id:r.batch_id,quantity,price});renderItems()}closeModal();toast(value("customForStock")==="1"?"Medicine added to stock":"Custom medicine added to bill")}catch(e){toast(e.message)}}function addItem(){let id=Date.now()+Math.random();billItems.push({id,batch_id:'',quantity:1,price:0});renderItems()}function removeItem(id){billItems=billItems.filter(x=>x.id!==id);renderItems()}function selectItem(id,v){let it=billItems.find(x=>x.id==id),m=meds.find(x=>x.batch_id==v);it.batch_id=v;it.price=m?m.selling_price:0;renderItems()}function changeItem(id,k,v){billItems.find(x=>x.id==id)[k]=+v;calc()}function renderItems(){$('items').innerHTML=billItems.map((it,n)=>`<div class="item-row"><div><label>${n+1}. Medicine / Batch</label><select onchange="selectItem('${it.id}',this.value)"><input   type="text"   id="medicineName"   placeholder="Type medicine name"   autocomplete="off" >${meds.map(m=>`<option value="${m.batch_id}" ${m.batch_id==it.batch_id?'selected':''}>${m.name} — ${m.batch_number} (Stock: ${m.batch_stock})</option>`).join('')}</select></div><div><label>Qty</label><input type="number" min="1" value="${it.quantity}" oninput="changeItem('${it.id}','quantity',this.value)"></div><div><label>Price (₹)</label><input type="number" value="${it.price}" oninput="changeItem('${it.id}','price',this.value)"></div><div><label>Amount</label><input disabled value="₹${(it.quantity*it.price).toFixed(2)}"></div><button class="danger" onclick="removeItem('${it.id}')">Remove</button></div>`).join('');calc()}function calc(){let sub=billItems.reduce((a,i)=>a+i.quantity*i.price,0);$('total').textContent=(sub-(+$('discount').value||0)+(+$('gst').value||0)).toFixed(2)}async function saveBill(){try{let items=billItems.filter(i=>i.batch_id);if(!items.length)throw Error('Choose a medicine');let x=await api('/api/bills',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer:$('customer').value,mobile:$('mobile').value,doctor:$('doctor').value,date:$('date').value,paymentMode:$('payment').value,gst:$('gst').value,discount:$('discount').value,items})});toast('Bill '+x.bill_number+' saved');setTimeout(()=>window.open('/print/'+x.id,'_blank'),150);setTimeout(()=>{billItems=[];addItem();$('customer').value='';$('mobile').value=''},500)}catch(e){toast(e.message)}}async function loadBills(){let qs=new URLSearchParams({search:$('search').value,from:$('from').value,to:$('to').value});let rows=await api('/api/bills?'+qs);$('billRows').innerHTML=rows.map(s=>`<tr><td>${s.bill_number}</td><td>${s.bill_date}</td><td>${s.customer||'Walk-in'}</td><td>${s.doctor||'-'}</td><td>₹${s.total_amount.toFixed(2)}</td><td>${s.payment_mode}</td><td><span class="status ${s.status}">${s.status}</span></td><td class="actions"><button class="outline" onclick="viewBill(${s.id})">View</button><button class="outline" onclick="downloadBill(${s.id},'pdf')">PDF</button><button class="outline" onclick="downloadBill(${s.id},'word')">Word</button><button class="outline" onclick="downloadBill(${s.id},'excel')">Excel</button>${s.status==='COMPLETED'?`<button class="danger" onclick="cancelBill(${s.id})">Cancel / Remove</button>`:''}</td></tr>`).join('')}function downloadBill(id,k){location.href='/api/export/'+k+'?bill='+id}function downloadReport(k){let q=new URLSearchParams({search:$('search').value,from:$('from').value,to:$('to').value});location.href='/api/export/'+k+'?'+q}async function viewBill(id){let x=await api('/api/bills/'+id);$('modalContent').innerHTML=`<h1>${x.sale.bill_number}</h1><p>${x.sale.bill_date} · ${x.items[0].customer||'Walk-in'} · ${x.sale.payment_mode}</p><table><tr><th>Medicine</th><th>Qty</th><th>Batch</th><th>Amount</th></tr>${x.items.map(i=>`<tr><td>${i.medicine_name}</td><td>${i.quantity}</td><td>${i.batch_number}</td><td>₹${i.total_amount}</td></tr>`).join('')}</table><h2 style="text-align:right">Total ₹${x.sale.total_amount}</h2>`;$('modal').classList.remove('hidden')}function closeModal(){$('modal').classList.add('hidden')}async function cancelBill(id){if(!confirm('Cancel this bill and restore the sold quantities to stock?'))return;try{await api('/api/bills/'+id+'/cancel',{method:'POST'});toast('Bill cancelled; stock restored');loadBills()}catch(e){toast(e.message)}}async function loadReports(){let x=await api('/api/reports');$('rBills').textContent=x.summary.bills;$('rTotal').textContent=x.summary.total.toFixed(2);$('rCancelled').textContent=x.summary.cancelled}async function restoreDb(){try{await api('/api/restore',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({backupPath:$('restorePath').value})});toast('Database restored')}catch(e){toast(e.message)}}init();
-function selectItem(id,value){const item=billItems.find(x=>x.id==id);const medicine=meds.find(m=>String(m.batch_id)===String(value))||meds.find(m=>m.name.toLowerCase()===String(value).toLowerCase());if(!medicine)return;item.batch_id=medicine.batch_id;item.price=Number(medicine.selling_price||0);renderItems()}function renderItems(){const options=meds.map(m=>`<option value="${m.name}">`).join('');$('items').innerHTML=`<datalist id="medicineOptions">${options}</datalist>`+billItems.map((item,index)=>{const medicine=meds.find(m=>String(m.batch_id)===String(item.batch_id));return `<div class="item-row"><div><label>${index+1}. Medicine Name</label><input list="medicineOptions" placeholder="Type medicine name" value="${medicine?medicine.name:''}" oninput="selectItem('${item.id}',this.value)"></div><div><label>Qty</label><input type="number" min="1" value="${item.quantity}" oninput="changeItem('${item.id}','quantity',this.value)"></div><div><label>Price (₹)</label><input type="number" value="${item.price}" oninput="changeItem('${item.id}','price',this.value)"></div><div><label>Amount</label><input disabled value="₹${(item.quantity*item.price).toFixed(2)}"></div><button class="danger" onclick="removeItem('${item.id}')">Remove</button></div>`}).join('');calc()}function addCustomMedicine(stockOnly=false){$('modalContent').innerHTML=`<h2>Add Custom Medicine</h2><p>Medicine name, quantity and price डालें। Amount अपने-आप निकलेगा।</p><input id="customForStock" type="hidden" value="${stockOnly?'1':'0'}"><div class="grid"><div class="span2"><label>Medicine Name</label><input id="customName" placeholder="Medicine name"></div><div><label>Quantity</label><input id="customQty" type="number" min="1" value="1" oninput="customAmount()"></div><div><label>Price (₹)</label><input id="customPrice" type="number" min="0" value="0" oninput="customAmount()"></div><div><label>Amount</label><div id="customAmount" style="padding:10px;font-weight:bold">₹0.00</div></div><div><label>Batch No. (optional)</label><input id="customBatch" placeholder="Auto-generated if blank"></div><div><label>Manufacturer</label><input id="customManufacturer" placeholder="Manufacturer"></div></div><button class="primary" onclick="saveCustomFromForm()">Add to Bill</button>`;$('modal').classList.remove('hidden')}async function saveCustomFromForm(){const value=id=>$(id).value;const quantity=Number(value('customQty')),price=Number(value('customPrice'));if(!value('customName')||quantity<=0||price<0)return toast('Enter medicine name, quantity and price');try{const response=await api('/api/medicines',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:value('customName'),manufacturer:value('customManufacturer'),batch_number:value('customBatch')||('CUSTOM-'+Date.now()),price,mrp:price,stock:quantity})});const boot=await api('/api/bootstrap');meds=boot.medicines;if(value('customForStock')!=='1'){billItems.push({id:Date.now()+Math.random(),batch_id:response.batch_id,quantity,price});renderItems()}closeModal();toast(value('customForStock')==='1'?'Medicine added to stock':'Medicine added to bill')}catch(error){toast(error.message)}}renderItems()</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shree Ram Medical – Bill with Search</title>
+  <!-- Font & base style -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f4f7fc; color: #13233c; }
+    .top { height: 76px; background: #062e6c; color: white; display: flex; align-items: center; padding: 0 28px; gap: 13px; }
+    .logo { width: 57px; height: 57px; border-radius: 50%; object-fit: cover; background: #fff; border: 2px solid #fff; }
+    .brand { font-weight: 800; letter-spacing: 0.5px; }
+    .brand small { display: block; font-weight: 400; font-size: 11px; opacity: 0.75; }
+    .layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 76px); }
+    aside { background: #fff; border-right: 1px solid #dde5ef; padding: 18px 10px; }
+    aside button { border: 0; background: transparent; width: 100%; padding: 13px; text-align: left; border-radius: 8px; color: #45556d; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    aside button.active, aside button:hover { background: #e9f0fc; color: #073b89; font-weight: 700; }
+    main { padding: 28px; max-width: 1500px; width: 100%; margin: 0 auto; }
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    .sub { color: #6b7a90; margin-bottom: 22px; }
+    .panel { background: #fff; border: 1px solid #e0e7ef; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(45, 85, 112, 0.06); margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .span2 { grid-column: span 2; }
+    label { font-size: 12px; font-weight: 700; color: #52627b; display: block; margin-bottom: 4px; }
+    input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd6e2; border-radius: 7px; background: #fff; color: #192b45; font-size: 14px; }
+    input:focus, select:focus { outline: 2px solid #073b89; outline-offset: 1px; border-color: transparent; }
+    button.primary, button.outline, button.danger { padding: 10px 18px; border-radius: 8px; border: 0; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .primary { background: #073b89; color: #fff; }
+    .primary:hover { background: #052d6b; }
+    .outline { background: #eef4ff; color: #073b89; }
+    .outline:hover { background: #dce6fc; }
+    .danger { background: #fce8e7; color: #a4231c; }
+    .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+    .summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .metric { padding: 18px; border-radius: 12px; background: linear-gradient(135deg, #06357e, #1559b0); color: white; }
+    .metric b { font-size: 26px; display: block; margin-top: 6px; }
+    .item-row { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr auto; gap: 12px; margin: 12px 0; align-items: end; }
+    .item-row > div { display: flex; flex-direction: column; }
+    .item-row input, .item-row select { width: 100%; }
+    .total { font-size: 20px; font-weight: 800; text-align: right; padding-top: 14px; border-top: 1px solid #e5eaf0; margin-top: 10px; }
+    .tablewrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th { text-align: left; background: #f5f8fc; color: #53647c; padding: 11px 9px; border-bottom: 1px solid #e8edf3; }
+    td { padding: 11px 9px; border-bottom: 1px solid #e8edf3; white-space: nowrap; }
+    .status { padding: 4px 10px; border-radius: 30px; font-size: 11px; font-weight: 800; display: inline-block; }
+    .COMPLETED { background: #e6f6ec; color: #16723c; }
+    .CANCELLED { background: #fce7e6; color: #aa2520; }
+    .hidden { display: none !important; }
+    .actions button { font-size: 11px; padding: 5px 9px; margin-right: 4px; }
+    .notice { position: fixed; right: 20px; bottom: 20px; background: #16375e; color: #fff; padding: 12px 20px; border-radius: 10px; display: none; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    .modal { position: fixed; inset: 0; background: rgba(0, 26, 59, 0.5); display: grid; place-items: center; z-index: 999; }
+    .modal .panel { max-width: 780px; width: 95%; max-height: 85vh; overflow: auto; }
+    .modal .panel .close { float: right; font-size: 24px; background: none; border: 0; cursor: pointer; }
+    .medicine-search-wrap { position: relative; }
+    .medicine-search-wrap input { padding-right: 36px; }
+    .medicine-search-wrap i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #8a9bb0; }
+    .datalist-hint { font-size: 11px; color: #6b7a90; margin-top: 3px; }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { display: flex; overflow-x: auto; padding: 10px; gap: 6px; }
+      aside button { white-space: nowrap; width: auto; }
+      .grid, .summary { grid-template-columns: 1fr 1fr; }
+      .span2 { grid-column: span 2; }
+      .item-row { grid-template-columns: 1fr 1fr; }
+      .item-row button { grid-column: span 2; }
+      main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+<header class="top">
+  <img id="appLogo" class="logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='57' height='57' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23062e6c'/%3E%3Ctext x='30' y='65' font-size='32' fill='white' font-family='Inter' font-weight='800'%3ESR%3C/text%3E%3C/svg%3E" alt="Shree Ram Medical logo">
+  <div class="brand">SHREE RAM MEDICAL<small>Hospital Pharmacy • Rewas Dewda, M.P.</small></div>
+</header>
+<div class="layout">
+  <aside>
+    <button class="active" onclick="show('billing',this)"><i class="fas fa-file-invoice"></i> New Bill</button>
+    <button onclick="show('inventory',this);loadInventory()"><i class="fas fa-capsules"></i> Medicines & Stock</button>
+    <button onclick="show('history',this)"><i class="fas fa-history"></i> Bill History</button>
+    <button onclick="show('reports',this)"><i class="fas fa-chart-bar"></i> Reports & Exports</button>
+    <button onclick="show('admin',this)"><i class="fas fa-database"></i> Admin Backup</button>
+  </aside>
+  <main>
+    <!-- BILLING SECTION -->
+    <section id="billing">
+      <h1>New Cash Memo</h1>
+      <p class="sub">Search medicine by name – type and select from suggestions.</p>
+      <div class="panel">
+        <div class="grid">
+          <div class="span2"><label>Customer / Patient Name</label><input id="customer" placeholder="Walk-in Customer"></div>
+          <div><label>Mobile Number</label><input id="mobile" placeholder="10 digit mobile"></div>
+          <div><label>Bill Date</label><input id="date" type="date"></div>
+          <div class="span2"><label>Doctor Name</label><input id="doctor" list="doctors" placeholder="Select or type doctor"><datalist id="doctors"></datalist></div>
+          <div><label>Payment Mode</label><select id="payment"><option>Cash</option><option>UPI</option><option>Card</option><option>Credit</option></select></div>
+          <div><label>GST (₹)</label><input id="gst" type="number" value="0" min="0" oninput="calc()"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <h2 style="margin:0">Medicines</h2>
+          <div>
+            <button class="outline" onclick="addItem()"><i class="fas fa-plus"></i> Add Medicine</button>
+            <button class="primary" onclick="addCustomMedicine(false)"><i class="fas fa-pills"></i> Custom</button>
+          </div>
+        </div>
+        <div id="items"></div>
+        <div class="grid" style="margin-top:13px">
+          <div><label>Bill Discount (₹)</label><input id="discount" value="0" type="number" min="0" oninput="calc()"></div>
+        </div>
+        <div class="total">Grand Total: ₹<span id="total">0.00</span></div>
+        <button class="primary" onclick="saveBill()"><i class="fas fa-save"></i> Save Bill & Print</button>
+      </div>
+    </section>
+
+    <!-- HISTORY, INVENTORY, REPORTS, ADMIN (simplified) -->
+    <section id="history" class="hidden"><h1>Bill History</h1><p class="sub">Search invoices, export, cancel.</p><div class="panel toolbar"><div><label>Search</label><input id="search" oninput="loadBills()" placeholder="Search..."></div><div><label>From</label><input id="from" type="date" onchange="loadBills()"></div><div><label>To</label><input id="to" type="date" onchange="loadBills()"></div><button class="outline" onclick="downloadReport('excel')">Excel</button><button class="outline" onclick="downloadReport('word')">Word</button><button class="outline" onclick="downloadReport('pdf')">PDF</button></div><div class="panel tablewrap"><table><thead><tr><th>Bill No.</th><th>Date</th><th>Customer</th><th>Doctor</th><th>Total</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody id="billRows"></tbody></table></div></section>
+    <section id="inventory" class="hidden"><h1>Medicines & Stock</h1><div class="panel"><button class="primary" onclick="addCustomMedicine(true)">+ Add Medicine to Stock</button></div><div class="panel tablewrap"><table><thead><tr><th>Medicine</th><th>Manufacturer</th><th>Batch</th><th>Expiry</th><th>MRP</th><th>Selling Price</th><th>Qty</th></tr></thead><tbody id="stockRows"></tbody></table></div></section>
+    <section id="reports" class="hidden"><h1>Reports</h1><div class="summary"><div class="metric">COMPLETED <b id="rBills">0</b></div><div class="metric">SALES <b>₹<span id="rTotal">0.00</span></b></div><div class="metric">CANCELLED <b id="rCancelled">0</b></div></div><div class="panel"><button class="primary" onclick="downloadReport('excel')">Excel</button> <button class="outline" onclick="downloadReport('word')">Word</button> <button class="outline" onclick="downloadReport('pdf')">PDF</button></div></section>
+    <section id="admin" class="hidden"><h1>Admin Backup</h1><div class="panel"><h2>Logo</h2><input id="logoFile" type="file" accept="image/*"><button class="primary" onclick="saveLogo()">Upload</button></div><div class="panel"><button class="primary" onclick="location.href='/api/backup'">Download Backup</button></div></section>
+  </main>
+</div>
+<div id="notice" class="notice"></div>
+<div id="modal" class="modal hidden"><div class="panel"><button class="close" onclick="closeModal()">✕</button><div id="modalContent"></div></div></div>
+
+<script>
+  // ----- helpers -----
+  const $ = id => document.getElementById(id);
+  const toast = (msg) => { const n=$('notice'); n.textContent=msg; n.style.display='block'; setTimeout(()=>n.style.display='none',3000); };
+  const api = async (url, opt) => { const r=await fetch(url,opt); const x=await r.json(); if(!r.ok) throw Error(x.error||'Request failed'); return x; };
+  function closeModal() { $('modal').classList.add('hidden'); }
+  function show(id,btn) { document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden')); $(id).classList.remove('hidden'); document.querySelectorAll('aside button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); if(id==='history') loadBills(); if(id==='reports') loadReports(); }
+
+  // ----- DATA -----
+  let meds = [];
+  let billItems = [];
+
+  // init date
+  $('date').value = new Date().toISOString().slice(0,10);
+
+  // ----- bootstrap -----
+  async function init() {
+    try {
+      const logo = await api('/api/settings/logo');
+      if(logo.logo) $('appLogo').src = logo.logo;
+    } catch(e) {}
+    const data = await api('/api/bootstrap');
+    meds = data.medicines;
+    // populate doctor list
+    $('doctors').innerHTML = data.doctors.map(d => `<option value="${d.name}">`).join('');
+    addItem();
+  }
+
+  // ----- render items (with search text input) -----
+  function renderItems() {
+    // Build datalist for medicine search
+    const options = meds.map(m => `<option value="${m.name}">`).join('');
+    const datalistId = 'medSearchList';
+    let html = `<datalist id="${datalistId}">${options}</datalist>`;
+
+    billItems.forEach((item, idx) => {
+      const med = meds.find(m => String(m.batch_id) === String(item.batch_id));
+      const displayName = med ? med.name : '';
+      html += `<div class="item-row" data-id="${item.id}">
+        <div class="medicine-search-wrap">
+          <label>${idx+1}. Medicine / Batch</label>
+          <input list="${datalistId}" 
+                 placeholder="Type medicine name" 
+                 value="${displayName}" 
+                 oninput="onMedicineSearch('${item.id}', this.value)" 
+                 autocomplete="off">
+          <i class="fas fa-search"></i>
+          <div class="datalist-hint">Type name, select suggestion</div>
+        </div>
+        <div><label>Qty</label><input type="number" min="1" value="${item.quantity}" oninput="changeItem('${item.id}','quantity',this.value)"></div>
+        <div><label>Price (₹)</label><input type="number" value="${item.price}" oninput="changeItem('${item.id}','price',this.value)"></div>
+        <div><label>Amount</label><input disabled value="₹${(item.quantity*item.price).toFixed(2)}"></div>
+        <button class="danger" onclick="removeItem('${item.id}')" style="align-self:end;padding:10px 14px;"><i class="fas fa-trash"></i></button>
+      </div>`;
+    });
+    $('items').innerHTML = html;
+    calc();
+  }
+
+  // ----- medicine search handler (replaces dropdown) -----
+  function onMedicineSearch(itemId, typedValue) {
+    const item = billItems.find(x => String(x.id) === String(itemId));
+    if (!item) return;
+    // find exact match by name (case insensitive)
+    const matched = meds.find(m => m.name.toLowerCase() === typedValue.toLowerCase().trim());
+    if (matched) {
+      item.batch_id = matched.batch_id;
+      item.price = Number(matched.selling_price) || 0;
+      // refresh to show price and amount
+      renderItems();
+    } else {
+      // if no exact match, keep typed value but don't set batch_id (we'll treat as custom later)
+      // we keep it as is; user can type and add as custom via "Custom" button
+      // but we also allow to clear batch if text is empty
+      if (typedValue.trim() === '') {
+        item.batch_id = '';
+        item.price = 0;
+        renderItems();
+      }
+    }
+  }
+
+  // ----- item manipulation -----
+  function addItem() {
+    billItems.push({ id: Date.now() + Math.random()*1000, batch_id: '', quantity: 1, price: 0 });
+    renderItems();
+  }
+  function removeItem(id) {
+    billItems = billItems.filter(x => String(x.id) !== String(id));
+    renderItems();
+  }
+  function changeItem(id, key, val) {
+    const item = billItems.find(x => String(x.id) === String(id));
+    if (!item) return;
+    item[key] = key === 'quantity' || key === 'price' ? Number(val) : val;
+    renderItems();
+  }
+  function calc() {
+    const sub = billItems.reduce((a,i) => a + (i.quantity||0)*(i.price||0), 0);
+    const discount = Number($('discount').value) || 0;
+    const gst = Number($('gst').value) || 0;
+    $('total').textContent = (sub - discount + gst).toFixed(2);
+  }
+
+  // ----- custom medicine modal (same as original, but we keep it) -----
+  function customAmount() {
+    const q = Number($('customQty').value || 0);
+    const p = Number($('customPrice').value || 0);
+    $('customAmount').textContent = '₹' + (q*p).toFixed(2);
+  }
+  function addCustomMedicine(stockOnly = false) {
+    $('modalContent').innerHTML = `
+      <h2>Add Custom Medicine</h2>
+      <p>Enter medicine details. Amount calculated automatically.</p>
+      <input id="customForStock" type="hidden" value="${stockOnly?'1':'0'}">
+      <div class="grid">
+        <div class="span2"><label>Medicine Name</label><input id="customName" placeholder="Medicine name"></div>
+        <div><label>Quantity</label><input id="customQty" type="number" min="1" value="1" oninput="customAmount()"></div>
+        <div><label>Price (₹)</label><input id="customPrice" type="number" min="0" value="0" oninput="customAmount()"></div>
+        <div><label>Amount</label><div id="customAmount" style="padding:10px;font-weight:bold">₹0.00</div></div>
+        <div><label>MRP (₹)</label><input id="customMrp" type="number" min="0" value="0"></div>
+        <div><label>Batch Number</label><input id="customBatch" placeholder="Batch no."></div>
+        <div><label>Expiry Date</label><input id="customExpiry" type="date"></div>
+        <div class="span2"><label>Manufacturer</label><input id="customManufacturer" placeholder="Manufacturer"></div>
+      </div>
+      <button class="primary" onclick="saveCustomFromForm()">Save Medicine</button>
+    `;
+    $('modal').classList.remove('hidden');
+  }
+  async function saveCustomFromForm() {
+    const val = id => $(id).value;
+    const quantity = Number(val('customQty')), price = Number(val('customPrice'));
+    if (!val('customName') || quantity <= 0 || price < 0) return toast('Enter name, quantity and price');
+    try {
+      const resp = await api('/api/medicines', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: val('customName'),
+          manufacturer: val('customManufacturer'),
+          batch_number: val('customBatch') || ('CUST-'+Date.now()),
+          expiry_date: val('customExpiry'),
+          price,
+          mrp: Number(val('customMrp')) || price,
+          stock: quantity
+        })
+      });
+      const boot = await api('/api/bootstrap');
+      meds = boot.medicines;
+      if (val('customForStock') !== '1') {
+        billItems.push({ id: Date.now()+Math.random()*1000, batch_id: resp.batch_id, quantity, price });
+        renderItems();
+      }
+      closeModal();
+      toast(val('customForStock') === '1' ? 'Added to stock' : 'Added to bill');
+    } catch(e) { toast(e.message); }
+  }
+
+  // ----- save bill -----
+  async function saveBill() {
+    try {
+      const items = billItems.filter(i => i.batch_id);
+      if (!items.length) throw Error('Please add at least one medicine (select from search)');
+      const payload = {
+        customer: $('customer').value,
+        mobile: $('mobile').value,
+        doctor: $('doctor').value,
+        date: $('date').value,
+        paymentMode: $('payment').value,
+        gst: $('gst').value,
+        discount: $('discount').value,
+        items
+      };
+      const res = await api('/api/bills', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+      toast('Bill '+res.bill_number+' saved');
+      setTimeout(() => window.open('/print/'+res.id, '_blank'), 200);
+      setTimeout(() => { billItems = []; addItem(); $('customer').value=''; $('mobile').value=''; }, 400);
+    } catch(e) { toast(e.message); }
+  }
+
+  // ----- load history / inventory / reports (stubs) -----
+  async function loadBills() {
+    const qs = new URLSearchParams({ search: $('search').value, from: $('from').value, to: $('to').value });
+    const rows = await api('/api/bills?'+qs);
+    $('billRows').innerHTML = rows.map(s => `
+      <tr>
+        <td>${s.bill_number}</td><td>${s.bill_date}</td><td>${s.customer||'Walk-in'}</td>
+        <td>${s.doctor||'-'}</td><td>₹${s.total_amount.toFixed(2)}</td><td>${s.payment_mode}</td>
+        <td><span class="status ${s.status}">${s.status}</span></td>
+        <td class="actions">
+          <button class="outline" onclick="viewBill(${s.id})">View</button>
+          <button class="outline" onclick="downloadBill(${s.id},'pdf')">PDF</button>
+          ${s.status==='COMPLETED'?`<button class="danger" onclick="cancelBill(${s.id})">Cancel</button>`:''}
+        </td>
+      </tr>`).join('');
+  }
+  function downloadBill(id,type){ location.href='/api/export/'+type+'?bill='+id; }
+  function downloadReport(type){ const q = new URLSearchParams({search:$('search').value,from:$('from').value,to:$('to').value}); location.href='/api/export/'+type+'?'+q; }
+  async function viewBill(id){ const x=await api('/api/bills/'+id); $('modalContent').innerHTML=`<h1>${x.sale.bill_number}</h1><p>${x.sale.bill_date} · ${x.items[0].customer||'Walk-in'}</p><table><tr><th>Medicine</th><th>Qty</th><th>Amount</th></tr>${x.items.map(i=>`<tr><td>${i.medicine_name}</td><td>${i.quantity}</td><td>₹${i.total_amount}</td></tr>`).join('')}</table><h2>Total ₹${x.sale.total_amount}</h2>`; $('modal').classList.remove('hidden'); }
+  async function cancelBill(id){ if(!confirm('Cancel & restore stock?')) return; try{ await api('/api/bills/'+id+'/cancel',{method:'POST'}); toast('Cancelled'); loadBills(); }catch(e){ toast(e.message); } }
+  async function loadInventory(){ const x=await api('/api/inventory'); $('stockRows').innerHTML=x.map(m=>`<tr><td>${m.name}</td><td>${m.manufacturer||'-'}</td><td>${m.batch_number}</td><td>${m.expiry_date||'-'}</td><td>₹${m.mrp}</td><td>₹${m.selling_price}</td><td>${m.batch_stock}</td></tr>`).join(''); }
+  async function loadReports(){ const x=await api('/api/reports'); $('rBills').textContent=x.summary.bills; $('rTotal').textContent=x.summary.total.toFixed(2); $('rCancelled').textContent=x.summary.cancelled; }
+  async function saveLogo(){ const f=$('logoFile').files[0]; if(!f) return toast('Select a file'); const reader=new FileReader(); reader.onload=async()=>{ try{ await api('/api/settings/logo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dataUrl:reader.result})}); $('appLogo').src=reader.result; toast('Logo updated'); }catch(e){ toast(e.message); } }; reader.readAsDataURL(f); }
+
+  // start
+  init();
+</script>
+</body>
+</html>
