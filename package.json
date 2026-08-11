@@ -1,0 +1,12 @@
+{
+  "name": "shreeram-medical-billing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.postgres.js",
+    "start:sqlite": "node server.js"
+  },
+  "dependencies": { "pg": "^8.13.1" }
+}

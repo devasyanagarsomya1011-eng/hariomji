@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: shreeram-medical-api
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shreeram-medical-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: PGSSLMODE
+        value: require
+databases:
+  - name: shreeram-medical-db
+    plan: free
+    databaseName: shreeram_medical
+    user: shreeram_medical
